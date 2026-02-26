@@ -47,7 +47,10 @@ export default function LoginView({ onLogin }: LoginViewProps) {
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 flex-1">
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="email" className="text-xs font-bold text-gray-700 uppercase tracking-wider ml-1">
+            <label
+              htmlFor="email"
+              className="text-xs font-bold text-gray-700 uppercase tracking-wider ml-1"
+            >
               Email Address
             </label>
             <div className="relative">
@@ -67,7 +70,10 @@ export default function LoginView({ onLogin }: LoginViewProps) {
           </div>
 
           <div className="flex flex-col gap-1.5 mb-2">
-            <label htmlFor="password" className="text-xs font-bold text-gray-700 uppercase tracking-wider ml-1">
+            <label
+              htmlFor="password"
+              className="text-xs font-bold text-gray-700 uppercase tracking-wider ml-1"
+            >
               Password
             </label>
             <div className="relative">
@@ -88,7 +94,7 @@ export default function LoginView({ onLogin }: LoginViewProps) {
 
           {error && (
             <div className="px-4 py-3 bg-rose-50 border border-rose-100/50 rounded-xl text-[13px] text-rose-600 font-medium flex items-center gap-2 animate-in fade-in slide-in-from-top-2 duration-200">
-              <Info size={16} className="shrink-0 text-rose-500" strokeWidth={2.5}/>
+              <Info size={16} className="shrink-0 text-rose-500" strokeWidth={2.5} />
               {error}
             </div>
           )}
@@ -116,7 +122,11 @@ export default function LoginView({ onLogin }: LoginViewProps) {
           <div className="flex gap-3 p-4 bg-indigo-50/50 border border-indigo-100/50 rounded-2xl text-[13px] text-indigo-900/70">
             <Info size={18} className="shrink-0 text-indigo-500" />
             <p className="leading-snug">
-              Don't have an account? Visit the <a href="#" className="font-semibold text-indigo-600 hover:underline">IntelliFill Web App</a> to sign up and configure your profile.
+              Don't have an account? Visit the{' '}
+              <a href="#" className="font-semibold text-indigo-600 hover:underline">
+                IntelliFill Web App
+              </a>{' '}
+              to sign up and configure your profile.
             </p>
           </div>
         </div>

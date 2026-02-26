@@ -3,10 +3,30 @@
   "name": "IntelliFill - Smart Form Autofill",
   "description": "Automatically fill forms using your stored profile data from documents you have uploaded",
   "version": "2.0.0",
-  "icons": { "16": "icons/icon-16.png", "48": "icons/icon-48.png", "128": "icons/icon-128.png" },
-  "permissions": ["storage", "alarms"],
-  "host_permissions": ["https://app.intellifill.com/api/*", "http://localhost:3002/api/*"],
-  "background": { "service_worker": "background.js" },
-  "action": { "default_title": "IntelliFill", "default_popup": "popup.html" },
-  "content_scripts": [{ "matches": ["<all_urls>"], "all_frames": false, "run_at": "document_end", "js": ["content-scripts/content.js"] }]
+  "icons": {
+    "16": "icons/icon-16.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "permissions": ["storage", "alarms", "tabs", "scripting"],
+  "host_permissions": ["https://app.intellifill.com/api/*", "http://localhost:3002/api/*", "<all_urls>", "http://localhost/*"],
+  "commands": {
+    "wxt:reload-extension": {
+      "description": "Reload the extension during development",
+      "suggested_key": {
+        "default": "Alt+R"
+      }
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "IntelliFill",
+    "default_popup": "popup.html"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval' http://localhost:3000; object-src 'self';",
+    "sandbox": "script-src 'self' 'unsafe-inline' 'unsafe-eval' http://localhost:3000; sandbox allow-scripts allow-forms allow-popups allow-modals; child-src 'self';"
+  }
 }
