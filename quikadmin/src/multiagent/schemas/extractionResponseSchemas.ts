@@ -8,6 +8,7 @@
  */
 
 import { z } from 'zod';
+import { zodToJsonSchema } from 'zod-to-json-schema';
 import { DocumentCategory } from '../types/state';
 
 // ============================================================================
@@ -18,18 +19,15 @@ import { DocumentCategory } from '../types/state';
  * Base schema for an extracted field with confidence
  */
 export const ExtractedFieldSchema = z.object({
-  value: z.union([z.string(), z.number(), z.boolean(), z.null()]).describe(
-    'The extracted value from the document'
-  ),
+  value: z
+    .union([z.string(), z.number(), z.boolean(), z.null()])
+    .describe('The extracted value from the document'),
   confidence: z
     .number()
     .min(0)
     .max(100)
     .describe('Confidence score from 0-100 indicating extraction reliability'),
-  rawText: z
-    .string()
-    .optional()
-    .describe('The original text that was matched, for verification'),
+  rawText: z.string().optional().describe('The original text that was matched, for verification'),
 });
 
 /**
@@ -59,10 +57,7 @@ const requiredStringField = () =>
  */
 const dateField = () =>
   z.object({
-    value: z
-      .string()
-      .nullable()
-      .describe('Date value in format YYYY-MM-DD or DD/MM/YYYY'),
+    value: z.string().nullable().describe('Date value in format YYYY-MM-DD or DD/MM/YYYY'),
     confidence: z.number().min(0).max(100),
     rawText: z.string().optional(),
   });
@@ -136,9 +131,7 @@ export const EmiratesIdExtractionSchema = z.object({
 export const VisaExtractionSchema = z.object({
   full_name: requiredStringField().describe('Visa holder full name'),
   visa_number: requiredStringField().describe('Visa number'),
-  visa_type: requiredStringField().describe(
-    'Type of visa (Employment, Tourist, Residence, etc.)'
-  ),
+  visa_type: requiredStringField().describe('Type of visa (Employment, Tourist, Residence, etc.)'),
   nationality: optionalField().describe('Nationality of visa holder'),
   passport_number: optionalField().describe('Passport number'),
   date_of_issue: dateField().optional().describe('Visa issue date'),
@@ -163,9 +156,7 @@ export const TradeLicenseExtractionSchema = z.object({
   date_of_expiry: dateField().describe('License expiry date'),
   legal_form: optionalField().describe('Legal form (LLC, Sole Proprietor, etc.)'),
   address: optionalField().describe('Business address'),
-  issuing_authority: optionalField().describe(
-    'Issuing authority (DED, Free Zone, etc.)'
-  ),
+  issuing_authority: optionalField().describe('Issuing authority (DED, Free Zone, etc.)'),
 });
 
 /**
@@ -302,77 +293,9 @@ export function getExtractionSchema(category: DocumentCategory): z.ZodType<any> 
 
 /**
  * Convert a Zod schema to JSON Schema format for Gemini API
- *
- * Note: This is a simplified converter. For production, consider using
- * the 'zod-to-json-schema' package for complete conversion.
  */
 export function zodToGeminiSchema(zodSchema: z.ZodType<any>): object {
-  // For now, we use a simplified approach
-  // The Gemini API is flexible with JSON schemas
-  const shape = (zodSchema as any)._def?.shape?.();
-
-  if (!shape) {
-    // Handle record types (generic schema)
-    return {
-      type: 'object',
-      additionalProperties: {
-        type: 'object',
-        properties: {
-          value: {
-            type: ['string', 'number', 'boolean', 'null'],
-          },
-          confidence: {
-            type: 'number',
-            minimum: 0,
-            maximum: 100,
-          },
-          rawText: {
-            type: 'string',
-          },
-        },
-        required: ['value', 'confidence'],
-      },
-    };
-  }
-
-  const properties: Record<string, object> = {};
-  const required: string[] = [];
-
-  for (const [key, value] of Object.entries(shape)) {
-    const fieldDef = (value as any)._def;
-
-    // Check if field is optional
-    const isOptional = fieldDef?.typeName === 'ZodOptional';
-
-    // Build property schema
-    properties[key] = {
-      type: 'object',
-      properties: {
-        value: {
-          type: ['string', 'number', 'boolean', 'null'],
-        },
-        confidence: {
-          type: 'number',
-          minimum: 0,
-          maximum: 100,
-        },
-        rawText: {
-          type: 'string',
-        },
-      },
-      required: ['value', 'confidence'],
-    };
-
-    if (!isOptional) {
-      required.push(key);
-    }
-  }
-
-  return {
-    type: 'object',
-    properties,
-    required,
-  };
+  return zodToJsonSchema(zodSchema, { target: 'openApi3' });
 }
 
 /**

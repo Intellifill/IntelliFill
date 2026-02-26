@@ -16,6 +16,7 @@
 
 import { GoogleGenerativeAI, GenerativeModel, Part, SchemaType } from '@google/generative-ai';
 import { z, ZodError } from 'zod';
+import { llmClientService } from '../../services/llm/LLMClientService';
 import { DocumentCategory } from '../types/state';
 import { piiSafeLogger as logger } from '../../utils/piiSafeLogger';
 import { ExtractedFieldResult, ExtractedDataWithConfidence } from '../../types/extractedData';
@@ -748,27 +749,6 @@ const EXTRACTION_PATTERNS: Record<string, RegExp> = {
 };
 
 // ============================================================================
-// API Key Management
-// ============================================================================
-
-/**
- * Get available Gemini API key
- */
-function getGeminiApiKey(): string {
-  const keys = [
-    process.env.GEMINI_API_KEY,
-    process.env.GOOGLE_API_KEY,
-    process.env.GOOGLE_GENERATIVE_AI_KEY,
-  ].filter((k): k is string => !!k && k.length > 0);
-
-  if (keys.length === 0) {
-    throw new Error('No Gemini API key configured. Set GEMINI_API_KEY environment variable.');
-  }
-
-  return keys[0];
-}
-
-// ============================================================================
 // Helper Functions
 // ============================================================================
 
@@ -804,56 +784,6 @@ async function withTimeout<T>(promise: Promise<T>, ms: number, operation: string
   );
   return Promise.race([promise, timeout]);
 }
-
-// ============================================================================
-// Rate Limiting (Simple Semaphore)
-// ============================================================================
-
-/**
- * Simple semaphore for rate limiting concurrent operations
- */
-class Semaphore {
-  private permits: number;
-  private queue: Array<() => void> = [];
-
-  constructor(permits: number) {
-    this.permits = permits;
-  }
-
-  async acquire(): Promise<void> {
-    if (this.permits > 0) {
-      this.permits--;
-      return;
-    }
-    return new Promise((resolve) => {
-      this.queue.push(resolve);
-    });
-  }
-
-  release(): void {
-    const next = this.queue.shift();
-    if (next) {
-      next();
-    } else {
-      this.permits++;
-    }
-  }
-
-  async run<T>(fn: () => Promise<T>): Promise<T> {
-    await this.acquire();
-    try {
-      return await fn();
-    } finally {
-      this.release();
-    }
-  }
-}
-
-/**
- * Global semaphore for rate limiting Gemini API calls
- * Max 5 concurrent calls to prevent cost spikes
- */
-const geminiSemaphore = new Semaphore(MAX_CONCURRENT_GEMINI_CALLS);
 
 /**
  * Detect image MIME type from base64 string
@@ -1485,9 +1415,8 @@ async function selfCorrectExtraction(
       );
 
       // Re-extract using Gemini (routed through semaphore for rate limiting)
-      const correctedFields = await geminiSemaphore.run(async () => {
-        const apiKey = getGeminiApiKey();
-        const genAI = new GoogleGenerativeAI(apiKey);
+      const correctedFields = await llmClientService.geminiSemaphore.run(async () => {
+        const genAI = llmClientService.getGeminiClient();
         const model = genAI.getGenerativeModel({ model: EXTRACTION_MODEL });
 
         const parts: Part[] = [{ text: correctionPrompt }];
@@ -1714,9 +1643,8 @@ async function extractWithGemini(
   imageBase64?: string
 ): Promise<Record<string, ExtractedFieldResult>> {
   // Use semaphore for rate limiting (max 5 concurrent calls)
-  return geminiSemaphore.run(async () => {
-    const apiKey = getGeminiApiKey();
-    const genAI = new GoogleGenerativeAI(apiKey);
+  return llmClientService.geminiSemaphore.run(async () => {
+    const genAI = llmClientService.getGeminiClient();
 
     // Use structured outputs if feature flag is enabled
     const useStructuredOutputs = FEATURE_FLAGS.STRUCTURED_OUTPUTS;
