@@ -380,7 +380,7 @@ describe('Supabase Authentication Routes', () => {
         role: 'USER',
         isActive: true,
         emailVerified: true,
-        lastLogin: null,
+        lastLogin: null as Date | null,
         createdAt: new Date(),
       };
 
@@ -457,7 +457,7 @@ describe('Supabase Authentication Routes', () => {
         role: 'USER',
         isActive: false,
         emailVerified: true,
-        lastLogin: null,
+        lastLogin: null as Date | null,
         createdAt: new Date(),
       };
 
@@ -488,7 +488,7 @@ describe('Supabase Authentication Routes', () => {
         role: 'USER',
         isActive: true,
         emailVerified: true,
-        lastLogin: null,
+        lastLogin: null as Date | null,
         createdAt: new Date(),
       };
 
@@ -794,7 +794,7 @@ describe('Supabase Authentication Routes', () => {
         emailVerified: true,
         organizationId: 'demo-org-id',
         createdAt: new Date(),
-        lastLogin: null,
+        lastLogin: null as Date | null,
       });
 
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);

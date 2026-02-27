@@ -38,8 +38,22 @@ jest.mock('../../../utils/piiSafeLogger', () => ({
   },
 }));
 
-// Import after mocking
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { llmClientService } from '../../../services/llm/LLMClientService';
+
+// Mock feature flags FIRST
+jest.mock('../../../config/featureFlags', () => ({
+  FEATURE_FLAGS: {
+    STRUCTURED_OUTPUTS: false,
+    EXTRACTION_CACHE: false,
+    SELF_CORRECTION: false,
+  },
+  SELF_CORRECTION_CONFIG: {
+    MAX_PASSES: 2,
+    LOW_CONFIDENCE_THRESHOLD: 80,
+    MAX_FIELDS_PER_PASS: 3,
+  }
+}));
 
 describe('ExtractorAgent', () => {
   // Store original env
@@ -52,6 +66,7 @@ describe('ExtractorAgent', () => {
       ...originalEnv,
       GEMINI_API_KEY: 'test-api-key-12345',
     };
+    (llmClientService as any).geminiInstance = null;
   });
 
   afterEach(() => {

@@ -20,7 +20,7 @@ describe('OrganizationInvitation Schema', () => {
         role: 'MEMBER',
         status: 'PENDING',
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        acceptedAt: null,
+        acceptedAt: null as Date | null,
         createdAt: new Date(),
       };
 
@@ -52,7 +52,7 @@ describe('OrganizationInvitation Schema', () => {
         role: 'MEMBER',
         status: 'EXPIRED',
         expiresAt: new Date(Date.now() - 24 * 60 * 60 * 1000),
-        acceptedAt: null,
+        acceptedAt: null as Date | null,
         createdAt: new Date(),
       };
 
@@ -68,7 +68,7 @@ describe('OrganizationInvitation Schema', () => {
         role: 'MEMBER',
         status: 'CANCELLED',
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        acceptedAt: null,
+        acceptedAt: null as Date | null,
         createdAt: new Date(),
       };
 
@@ -97,7 +97,7 @@ describe('OrganizationInvitation Schema', () => {
         role: 'MEMBER',
         status: 'PENDING',
         expiresAt,
-        acceptedAt: null,
+        acceptedAt: null as Date | null,
         createdAt: new Date(),
       };
 

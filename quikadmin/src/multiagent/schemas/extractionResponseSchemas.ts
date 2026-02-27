@@ -295,7 +295,7 @@ export function getExtractionSchema(category: DocumentCategory): z.ZodType<any> 
  * Convert a Zod schema to JSON Schema format for Gemini API
  */
 export function zodToGeminiSchema(zodSchema: z.ZodType<any>): object {
-  return zodToJsonSchema(zodSchema, { target: 'openApi3' });
+  return zodToJsonSchema(zodSchema as any, { target: 'openApi3' });
 }
 
 /**

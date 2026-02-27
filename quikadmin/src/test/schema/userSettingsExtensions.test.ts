@@ -20,15 +20,15 @@
 function createDefaultSettings(overrides: Record<string, any> = {}) {
   return {
     userId: overrides.userId || 'user-default',
-    defaultValidationRules: null,
+    defaultValidationRules: null as any,
     preferredLanguage: 'en',
     emailNotifications: true,
-    webhookUrl: null,
+    webhookUrl: null as string | null,
     autoOcr: false,
     ocrLanguage: 'en',
     autoMlEnhancement: true,
     defaultOutputFormat: 'pdf',
-    defaultExtractionProfile: null,
+    defaultExtractionProfile: null as string | null,
     retainOriginalFiles: true,
     timezone: 'UTC',
     // New extension fields

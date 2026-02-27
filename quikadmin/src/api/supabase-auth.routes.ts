@@ -891,15 +891,15 @@ export function createSupabaseAuthRoutes(): Router {
 
         // Sign out all sessions (security best practice)
         try {
-          await supabaseAdmin.auth.admin.signOut(session.user.id, 'global');
+          await supabaseAdmin.auth.admin.signOut(sessionUser.id, 'global');
           logger.info(
-            `All sessions invalidated after password reset for user: ${session.user.email}`
+            `All sessions invalidated after password reset for user: ${sessionUser.email}`
           );
         } catch (signOutError) {
           logger.warn('Failed to sign out all sessions after password reset:', signOutError);
         }
 
-        logger.info('Password reset successfully', { userId: session.user.id });
+        logger.info('Password reset successfully', { userId: sessionUser.id });
         res.json({
           success: true,
           message: 'Password reset successfully. Please login with your new password.',
