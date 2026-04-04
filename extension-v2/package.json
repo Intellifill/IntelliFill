@@ -27,6 +27,7 @@
     "@types/react-dom": "^18.3.7",
     "@wxt-dev/module-react": "^1.1.2",
     "autoprefixer": "^10.4.22",
+    "jsdom": "^29.0.1",
     "postcss": "^8.5.0",
     "tailwindcss": "^4.1.0",
     "typescript": "^5.9.0",
