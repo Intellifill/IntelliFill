@@ -12,6 +12,16 @@
  */
 export const FEATURE_FLAGS = {
   /**
+   * Phase 1.0: Use GLM-OCR via Ollama for document parsing
+   * When enabled, uses the GLM-OCR 0.9B VLM (local, free) for OCR.
+   * Provides layout-aware extraction with structured Markdown/JSON output.
+   * Falls back to Tesseract if Ollama/GLM-OCR is unavailable.
+   *
+   * Impact: +15-25% accuracy for forms/tables, structured output
+   */
+  GLM_OCR: process.env.FEATURE_GLM_OCR === 'true',
+
+  /**
    * Phase 1.1: Use Vision Language Model (VLM) for OCR
    * When enabled, uses Gemini 1.5 Pro Vision for complex/scanned documents
    * instead of Tesseract-only processing.
@@ -60,6 +70,26 @@ export const FEATURE_FLAGS = {
    * Impact: 40-60% cost reduction for repeated documents
    */
   EXTRACTION_CACHE: process.env.FEATURE_EXTRACTION_CACHE === 'true',
+} as const;
+
+/**
+ * GLM-OCR configuration (Ollama-based)
+ */
+export const GLM_OCR_CONFIG = {
+  /** Ollama API base URL */
+  BASE_URL: process.env.OLLAMA_BASE_URL || 'http://localhost:11434',
+
+  /** Model name in Ollama */
+  MODEL: process.env.GLM_OCR_MODEL || 'glm-ocr',
+
+  /** Request timeout in milliseconds (30s default — 0.9B model should respond fast) */
+  TIMEOUT_MS: parseInt(process.env.GLM_OCR_TIMEOUT_MS || '30000', 10),
+
+  /** Max image dimension (px) before downscaling — model degenerates on large images */
+  MAX_IMAGE_DIMENSION: parseInt(process.env.GLM_OCR_MAX_IMAGE_DIM || '1600', 10),
+
+  /** Temperature for generation */
+  TEMPERATURE: parseFloat(process.env.GLM_OCR_TEMPERATURE || '0.1'),
 } as const;
 
 /**
@@ -144,9 +174,7 @@ export const EXTRACTION_CACHE_CONFIG = {
 /**
  * Check if a specific feature is enabled
  */
-export function isFeatureEnabled(
-  feature: keyof typeof FEATURE_FLAGS
-): boolean {
+export function isFeatureEnabled(feature: keyof typeof FEATURE_FLAGS): boolean {
   return FEATURE_FLAGS[feature];
 }
 

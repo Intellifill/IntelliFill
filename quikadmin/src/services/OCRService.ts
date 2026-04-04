@@ -9,6 +9,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { logger } from '../utils/logger';
 import { getFileBuffer, isUrl } from '../utils/fileReader';
 import { FEATURE_FLAGS, VLM_CONFIG, COMPLEXITY_THRESHOLDS } from '../config/featureFlags';
+import { glmOcrService } from './GlmOcrService';
 
 export interface OCRResult {
   text: string;
@@ -23,7 +24,7 @@ export interface OCRResult {
     processingTime: number;
     pageCount: number;
     /** OCR engine used for extraction */
-    engineUsed?: 'tesseract' | 'vlm' | 'hybrid';
+    engineUsed?: 'tesseract' | 'vlm' | 'glm-ocr' | 'hybrid';
     /** Document complexity assessment */
     complexity?: 'simple' | 'complex';
   };
@@ -530,13 +531,43 @@ Return ONLY the extracted text, no commentary or explanation.`;
    */
   async extractWithSmartRouting(
     imageBuffer: Buffer,
-    forceEngine?: 'tesseract' | 'vlm'
+    forceEngine?: 'tesseract' | 'vlm' | 'glm-ocr'
   ): Promise<{
     text: string;
     confidence: number;
-    engineUsed: 'tesseract' | 'vlm' | 'hybrid';
+    engineUsed: 'tesseract' | 'vlm' | 'glm-ocr' | 'hybrid';
   }> {
     const startTime = Date.now();
+
+    // GLM-OCR path: try first when enabled (local, free, high accuracy)
+    // Read env dynamically so runtime toggles and late env setting work
+    const glmOcrEnabled = process.env.FEATURE_GLM_OCR === 'true';
+    if (
+      (glmOcrEnabled || forceEngine === 'glm-ocr') &&
+      forceEngine !== 'tesseract' &&
+      forceEngine !== 'vlm'
+    ) {
+      try {
+        const glmAvailable = await glmOcrService.isAvailable();
+        if (glmAvailable || forceEngine === 'glm-ocr') {
+          const result = await glmOcrService.parseDocument(imageBuffer);
+
+          logger.info('Smart routing: Using GLM-OCR result', {
+            confidence: result.confidence,
+            processingTimeMs: Date.now() - startTime,
+          });
+
+          return {
+            text: result.text,
+            confidence: result.confidence,
+            engineUsed: 'glm-ocr',
+          };
+        }
+      } catch (glmError) {
+        logger.warn('GLM-OCR failed, falling back to other engines:', glmError);
+        // Fall through to Tesseract/VLM
+      }
+    }
 
     // If VLM is disabled or Tesseract is forced, use Tesseract only
     if (!FEATURE_FLAGS.VLM_OCR || forceEngine === 'tesseract') {
@@ -992,8 +1023,8 @@ Return ONLY the extracted text, no commentary or explanation.`;
         logger.info(`Image downloaded (${imageBuffer.length} bytes)`);
       }
 
-      // Use smart routing if VLM is enabled
-      if (FEATURE_FLAGS.VLM_OCR) {
+      // Use smart routing if GLM-OCR or VLM is enabled
+      if (process.env.FEATURE_GLM_OCR === 'true' || FEATURE_FLAGS.VLM_OCR) {
         const smartResult = await this.extractWithSmartRouting(imageBuffer);
         const processingTime = Date.now() - startTime;
 

@@ -16,6 +16,12 @@ import { sanitizeLLMInput } from '../utils/sanitizeLLMInput';
 import { classifyDocument } from '../multiagent/agents/classifierAgent';
 import { extractDocumentData, mergeExtractionResults } from '../multiagent/agents/extractorAgent';
 import { getFileBuffer } from '../utils/fileReader';
+import { FEATURE_FLAGS } from '../config/featureFlags';
+import {
+  glmOcrService,
+  KIE_FIELDS_BY_CATEGORY,
+  KIE_GENERIC_FIELDS,
+} from '../services/GlmOcrService';
 
 // Supported image extensions for OCR
 const IMAGE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.webp', '.tiff', '.tif', '.bmp', '.gif'];
@@ -109,6 +115,59 @@ export const OCR_QUEUE_CONFIG = {
  * Feature flag for LLM extraction fallback
  */
 const LLM_EXTRACTION_ENABLED = process.env.ENABLE_LLM_EXTRACTION === 'true';
+
+/**
+ * Extract fields using GLM-OCR KIE (Key Information Extraction)
+ *
+ * Uses the local GLM-OCR model via Ollama to extract category-specific fields
+ * directly from the document image. This is free (no API costs) and fast on GPU.
+ *
+ * @param imageBuffer - Document image buffer
+ * @param category - Classified document category
+ * @returns Extracted fields in ExtractedDataWithConfidence format, or null if unavailable
+ */
+async function extractWithGlmOcrKie(
+  imageBuffer: Buffer,
+  category: string
+): Promise<ExtractedDataWithConfidence | null> {
+  if (!FEATURE_FLAGS.GLM_OCR) return null;
+
+  try {
+    const available = await glmOcrService.isAvailable();
+    if (!available) return null;
+
+    const fields = KIE_FIELDS_BY_CATEGORY[category] || KIE_GENERIC_FIELDS;
+    const kieResult = await glmOcrService.extractFields(imageBuffer, fields);
+
+    // Convert GLM-OCR KIE results to ExtractedDataWithConfidence format
+    const extractedFields: ExtractedDataWithConfidence = {};
+
+    for (const [fieldName, value] of Object.entries(kieResult.fields)) {
+      if (value !== null) {
+        extractedFields[fieldName] = {
+          value,
+          confidence: kieResult.fieldConfidence[fieldName] || 80,
+          source: 'llm' as const,
+          rawText: value,
+        };
+      }
+    }
+
+    logger.info('GLM-OCR KIE extraction completed', {
+      category,
+      fieldsRequested: fields.length,
+      fieldsExtracted: Object.keys(extractedFields).length,
+      processingTimeMs: kieResult.processingTimeMs,
+    });
+
+    return extractedFields;
+  } catch (error) {
+    logger.warn('GLM-OCR KIE extraction failed', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
+    return null;
+  }
+}
 
 /**
  * Map file extension to image mime type
@@ -469,55 +528,96 @@ if (ocrQueue) {
 
       let extractedFields = buildExtractedFieldsFromOCR(structuredData);
       const extractedFieldCount = Object.keys(extractedFields).length;
-      const shouldFallbackToLLM =
-        LLM_EXTRACTION_ENABLED &&
-        (extractedFieldCount === 0 ||
-          ocrResult.confidence < OCR_QUEUE_CONFIG.LLM_FALLBACK_THRESHOLD);
+      const needsEnhancedExtraction =
+        extractedFieldCount === 0 || ocrResult.confidence < OCR_QUEUE_CONFIG.LLM_FALLBACK_THRESHOLD;
 
       let llmSummary: Record<string, unknown> | null = null;
-      if (shouldFallbackToLLM) {
-        try {
-          const sanitizedText = sanitizeLLMInput(ocrResult.text || '');
-          let imageBase64: string | undefined;
 
-          if (isImage) {
-            const imageBuffer = await getFileBuffer(filePath);
-            const mimeType = getImageMimeTypeFromExtension(fileExt);
-            imageBase64 = `data:${mimeType};base64,${imageBuffer.toString('base64')}`;
+      // Strategy: GLM-OCR KIE (free, local) → Gemini LLM (API cost) → pattern fallback
+      if (needsEnhancedExtraction && (FEATURE_FLAGS.GLM_OCR || LLM_EXTRACTION_ENABLED)) {
+        // Step 1: Classify the document (needed for both GLM-OCR KIE and Gemini)
+        const sanitizedText = sanitizeLLMInput(ocrResult.text || '');
+        let imageBase64: string | undefined;
+        let imageBuffer: Buffer | undefined;
+
+        if (isImage) {
+          imageBuffer = await getFileBuffer(filePath);
+          const mimeType = getImageMimeTypeFromExtension(fileExt);
+          imageBase64 = `data:${mimeType};base64,${imageBuffer.toString('base64')}`;
+        }
+
+        const classification = await classifyDocument(sanitizedText, imageBase64);
+
+        // Step 2: Try GLM-OCR KIE first (free, local, fast on GPU)
+        let glmKieSucceeded = false;
+        if (FEATURE_FLAGS.GLM_OCR && imageBuffer) {
+          const kieFields = await extractWithGlmOcrKie(imageBuffer, classification.documentType);
+
+          if (kieFields && Object.keys(kieFields).length > 0) {
+            extractedFields = mergeExtractionResults(kieFields, extractedFields);
+            glmKieSucceeded = true;
+
+            llmSummary = {
+              used: true,
+              engine: 'glm-ocr-kie',
+              fallbackReason: extractedFieldCount === 0 ? 'empty_extraction' : 'low_confidence',
+              classification: {
+                category: classification.documentType,
+                confidence: classification.confidence,
+              },
+              extraction: {
+                modelUsed: 'glm-ocr',
+                totalFields: Object.keys(kieFields).length,
+              },
+            };
           }
+        }
 
-          const classification = await classifyDocument(sanitizedText, imageBase64);
-          const llmResult = await extractDocumentData(
-            sanitizedText,
-            classification.documentType,
-            imageBase64
-          );
+        // Step 3: Fall back to Gemini if GLM-OCR KIE didn't produce enough fields
+        const kieFieldCount = Object.keys(extractedFields).length;
+        const needsGeminiFallback =
+          !glmKieSucceeded || (kieFieldCount < 3 && LLM_EXTRACTION_ENABLED);
 
-          extractedFields = mergeExtractionResults(llmResult.fields, extractedFields);
+        if (needsGeminiFallback && LLM_EXTRACTION_ENABLED) {
+          try {
+            const llmResult = await extractDocumentData(
+              sanitizedText,
+              classification.documentType,
+              imageBase64
+            );
 
-          llmSummary = {
-            used: true,
-            fallbackReason: extractedFieldCount === 0 ? 'empty_extraction' : 'low_confidence',
-            classification: {
-              category: classification.documentType,
-              confidence: classification.confidence,
-            },
-            extraction: {
-              modelUsed: llmResult.modelUsed,
-              processingTimeMs: llmResult.processingTime,
-              totalFields: Object.keys(llmResult.fields).length,
-            },
-          };
-        } catch (llmError) {
-          logger.warn('LLM extraction fallback failed', {
-            documentId,
-            error: llmError instanceof Error ? llmError.message : 'Unknown error',
-          });
-          llmSummary = {
-            used: true,
-            failed: true,
-            error: llmError instanceof Error ? llmError.message : 'Unknown error',
-          };
+            extractedFields = mergeExtractionResults(llmResult.fields, extractedFields);
+
+            llmSummary = {
+              used: true,
+              engine: glmKieSucceeded ? 'glm-ocr-kie+gemini' : 'gemini',
+              fallbackReason: extractedFieldCount === 0 ? 'empty_extraction' : 'low_confidence',
+              classification: {
+                category: classification.documentType,
+                confidence: classification.confidence,
+              },
+              extraction: {
+                modelUsed: llmResult.modelUsed,
+                processingTimeMs: llmResult.processingTime,
+                totalFields: Object.keys(llmResult.fields).length,
+              },
+            };
+          } catch (llmError) {
+            logger.warn('Gemini LLM extraction fallback failed', {
+              documentId,
+              glmKieSucceeded,
+              error: llmError instanceof Error ? llmError.message : 'Unknown error',
+            });
+
+            // If GLM-OCR KIE already succeeded, keep those results
+            if (!glmKieSucceeded) {
+              llmSummary = {
+                used: true,
+                failed: true,
+                error: llmError instanceof Error ? llmError.message : 'Unknown error',
+              };
+            }
+          }
         }
       }
 
