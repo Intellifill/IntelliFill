@@ -37,7 +37,7 @@ checklists to complete each store submission.
    - A job application form (e.g., any company careers page)
    - A government form (e.g., a registration or contact form)
    - Any multi-field signup/checkout page
-6. Log in to the extension via the popup (connect to `app.intellifill.com`)
+6. Log in to the extension via the popup (connect to `intellifill-web.vercel.app`)
 
 **Screenshot 1 — Popup (logged-in state):**
 
@@ -84,7 +84,7 @@ Firefox screenshots can be the same images as Chrome — both stores accept the 
 ### Pre-Submission
 
 - [ ] Developer account registered at https://chrome.google.com/webstore/devconsole ($5 one-time fee)
-- [ ] Privacy policy live at https://intellifill.com/privacy (verify: `curl -s -o /dev/null -w "%{http_code}" https://intellifill.com/privacy` should return `200`)
+- [ ] Privacy policy live at https://intellifill-marketing.vercel.app/privacy (verify: `curl -s -o /dev/null -w "%{http_code}" https://intellifill-marketing.vercel.app/privacy` should return `200`)
 - [ ] Privacy page contains "Browser Extension Data Practices" section
 - [ ] Screenshots captured (at least 1, recommended 3) at 1280x800 or 640x400
 - [ ] Production zip built: `extension-v2/.output/intellifill-extension-2.0.0-chrome.zip`
@@ -110,7 +110,7 @@ ls -lh extension-v2/.output/intellifill-extension-2.0.0-chrome.zip
 4. **Privacy tab:**
    - **Single purpose:** paste from `extension-v2/store-listing/permission-justification.md`
      (the "Single-Purpose Description" section)
-   - **Privacy policy URL:** `https://intellifill.com/privacy`
+   - **Privacy policy URL:** `https://intellifill-marketing.vercel.app/privacy`
    - **Data use disclosures:** fill checkboxes per the "Data Use Disclosure" table in
      `permission-justification.md`:
      - PII: YES (cached locally for form autofill)
@@ -139,7 +139,7 @@ ls -lh extension-v2/.output/intellifill-extension-2.0.0-chrome.zip
 ### Pre-Submission
 
 - [ ] Mozilla account created at https://addons.mozilla.org/developers/ (free)
-- [ ] Privacy policy live at https://intellifill.com/privacy
+- [ ] Privacy policy live at https://intellifill-marketing.vercel.app/privacy
 - [ ] Screenshots captured (at least 1)
 - [ ] Production zip ready: `extension-v2/.output/intellifill-extension-2.0.0-firefox.zip`
 - [ ] Source zip ready: `extension-v2/.output/intellifill-extension-2.0.0-sources.zip`
@@ -181,10 +181,10 @@ WXT generates both the Firefox zip and a sources zip automatically.
 6. **Listing Details:**
    - **Summary (250 chars max):** paste from `extension-v2/store-listing/firefox-description.md`
      (the "Summary" section)
-     > IntelliFill is a smart form autofill extension that fills web forms using your stored profile data, extracted from documents you upload at app.intellifill.com.
+     > IntelliFill is a smart form autofill extension that fills web forms using your stored profile data, extracted from documents you upload at intellifill-web.vercel.app.
    - **Description:** paste from `firefox-description.md` (the "Description" section)
    - **Screenshots:** upload PNG files from `extension-v2/store-listing/screenshots/`
-   - **Privacy policy URL:** `https://intellifill.com/privacy`
+   - **Privacy policy URL:** `https://intellifill-marketing.vercel.app/privacy`
    - **License:** select your preferred license (or "All Rights Reserved" if proprietary)
 7. Click **Submit Version**
 
@@ -203,7 +203,7 @@ Run these commands before submitting to either store:
 
 ```bash
 # 1. Privacy policy is live with extension section
-curl -s https://intellifill.com/privacy | grep -c "Browser Extension Data Practices"
+curl -s https://intellifill-marketing.vercel.app/privacy | grep -c "Browser Extension Data Practices"
 # Expected: 1 or more
 
 # 2. No localhost in Chrome manifest

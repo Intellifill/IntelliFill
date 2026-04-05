@@ -10,8 +10,8 @@ export default defineConfig({
     permissions: ['storage', 'alarms'],
     host_permissions:
       mode === 'production'
-        ? ['https://app.intellifill.com/api/*']
-        : ['https://app.intellifill.com/api/*', 'http://localhost:3002/api/*'],
+        ? ['https://api.intellifill.nomadcrew.uk/api/*']
+        : ['https://api.intellifill.nomadcrew.uk/api/*', 'http://localhost:3002/api/*'],
     icons: {
       '16': 'icons/icon-16.png',
       '48': 'icons/icon-48.png',

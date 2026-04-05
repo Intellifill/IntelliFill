@@ -2,7 +2,7 @@
 
 ## Summary
 
-IntelliFill is a smart form autofill extension that fills web forms using your stored profile data, extracted from documents you upload at app.intellifill.com.
+IntelliFill is a smart form autofill extension that fills web forms using your stored profile data, extracted from documents you upload at intellifill-web.vercel.app.
 
 ---
 
@@ -12,7 +12,7 @@ Stop retyping the same information on every website. IntelliFill detects form fi
 
 ### How It Works
 
-1. Upload your documents (passport, driver's license, resume, etc.) at app.intellifill.com
+1. Upload your documents (passport, driver's license, resume, etc.) at intellifill-web.vercel.app
 2. Our AI extracts your information and builds a structured profile
 3. On any website with a form, IntelliFill detects input fields and suggests matching values
 4. Accept suggestions from the autocomplete dropdown, or press Alt+Shift+F to fill all fields at once
@@ -27,7 +27,7 @@ Stop retyping the same information on every website. IntelliFill detects form fi
 
 ### Privacy Policy
 
-https://intellifill.com/privacy
+https://intellifill-marketing.vercel.app/privacy
 
 ---
 

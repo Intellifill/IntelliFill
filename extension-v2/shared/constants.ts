@@ -1,5 +1,5 @@
 /** Default API base URL (resolved from WXT env at build time) */
-export const DEFAULT_API_URL = import.meta.env.WXT_API_URL ?? 'https://app.intellifill.com/api';
+export const DEFAULT_API_URL = import.meta.env.WXT_API_URL ?? 'https://api.intellifill.nomadcrew.uk/api';
 
 /** Profile cache duration in milliseconds (5 minutes) */
 export const CACHE_DURATION_MS = 5 * 60 * 1000;

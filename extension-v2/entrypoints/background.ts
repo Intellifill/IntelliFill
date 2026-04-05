@@ -176,7 +176,7 @@ export default defineBackground(() => {
       console.log('IntelliFill: Extension installed');
       extensionSettings.setValue({
         enabled: true,
-        apiEndpoint: import.meta.env.WXT_API_URL ?? 'https://app.intellifill.com/api',
+        apiEndpoint: import.meta.env.WXT_API_URL ?? 'https://api.intellifill.nomadcrew.uk/api',
         cacheMinutes: 5,
       });
     } else if (details.reason === 'update') {

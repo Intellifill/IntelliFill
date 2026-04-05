@@ -104,7 +104,7 @@ describe('authToken / refreshToken / cachedProfile defaults', () => {
 describe('extensionSettings defaults', () => {
   it('has expected default values', () => {
     expect(DEFAULT_SETTINGS.enabled).toBe(true);
-    expect(DEFAULT_SETTINGS.apiEndpoint).toBe('https://app.intellifill.com/api');
+    expect(DEFAULT_SETTINGS.apiEndpoint).toBe('https://api.intellifill.nomadcrew.uk/api');
     expect(DEFAULT_SETTINGS.cacheMinutes).toBe(5);
   });
 

@@ -20,7 +20,7 @@ IntelliFill requests broad host permissions for the following reasons:
 
 3. **No tracking, no passive data collection.** The extension does not monitor page visits, record navigation events, log URLs the user visits, or perform any activity outside of an active fill session. Host permission is used solely to inject the field-detection content script when the user interacts with the extension.
 
-4. **Minimal data transmission.** Only field metadata (not page content or user-typed values) is sent to our backend at `app.intellifill.com/api/extension/infer-fields` for AI-powered field matching. This API call occurs only when the user triggers autofill — not passively on every page load.
+4. **Minimal data transmission.** Only field metadata (not page content or user-typed values) is sent to our backend at `api.intellifill.nomadcrew.uk/api/extension/infer-fields` for AI-powered field matching. This API call occurs only when the user triggers autofill — not passively on every page load.
 
 ---
 
@@ -40,4 +40,4 @@ _(For Chrome Web Store Privacy tab — "Data use" declarations)_
 
 **Data Sharing:** Extension data is not sold, shared with third parties, or used for advertising purposes. Data sent to our servers is used solely to provide the field-matching feature and is not retained beyond the duration of the API call.
 
-**Privacy Policy:** https://intellifill.com/privacy
+**Privacy Policy:** https://intellifill-marketing.vercel.app/privacy
