@@ -20,7 +20,7 @@ import Footer from '../components/Footer.astro';
   <main class="bg-slate-900 px-4 py-16">
     <article class="mx-auto max-w-4xl prose prose-invert prose-slate">
       <h1 class="text-3xl font-bold text-white sm:text-4xl">Privacy Policy</h1>
-      <p class="text-slate-400 mt-2">Last updated: January 2026</p>
+      <p class="text-slate-400 mt-2">Last updated: April 2026</p>
 
       <section class="mt-12">
         <h2 class="text-xl font-semibold text-white">1. Information We Collect</h2>
@@ -81,7 +81,45 @@ import Footer from '../components/Footer.astro';
       </section>
 
       <section class="mt-10">
-        <h2 class="text-xl font-semibold text-white">6. Contact Us</h2>
+        <h2 class="text-xl font-semibold text-white">6. Browser Extension Data Practices</h2>
+        <p class="text-slate-300 mt-4">
+          When you use the IntelliFill browser extension, the following data practices apply in addition
+          to the above:
+        </p>
+        <ul class="text-slate-300 mt-4 space-y-2 list-disc list-inside">
+          <li>
+            <strong>Form Field Metadata:</strong> The extension reads form field attributes (name, label,
+            type, placeholder text) on web pages you visit while the extension is enabled. This metadata
+            is used solely to match fields with your stored profile data.
+          </li>
+          <li>
+            <strong>Data Sent to Our Servers:</strong> Field metadata is sent to our servers at
+            app.intellifill.com/api/extension/infer-fields for AI-powered field matching. Only field
+            attributes are sent — not the values you type into forms.
+          </li>
+          <li>
+            <strong>Authentication Tokens:</strong> Your login session token is stored in your browser's
+            local storage (browser.storage.local). Tokens are never synced to cloud storage or shared
+            across devices.
+          </li>
+          <li>
+            <strong>Profile Data Caching:</strong> Your profile data (name, address, and other form-fill
+            information) is cached locally in your browser for up to 5 minutes to enable fast autofill.
+            The cache is automatically cleared after expiry.
+          </li>
+          <li>
+            <strong>No Data Selling or Sharing:</strong> Extension data is not sold, shared with third
+            parties, or used for advertising purposes.
+          </li>
+          <li>
+            <strong>Data Removal:</strong> You can clear all extension data at any time from the extension
+            popup settings, or by uninstalling the extension.
+          </li>
+        </ul>
+      </section>
+
+      <section class="mt-10">
+        <h2 class="text-xl font-semibold text-white">7. Contact Us</h2>
         <p class="text-slate-300 mt-4">
           For privacy-related questions, contact us at <a href="mailto:privacy@intellifill.com" class="text-primary-400 hover:text-primary-300">privacy@intellifill.com</a>
         </p>
