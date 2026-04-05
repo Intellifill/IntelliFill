@@ -58,6 +58,7 @@ See [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md) for full details.
 **Total:** 3 phases, 8 plans, 63 files, +10.5k LOC
 
 **Delivered:**
+
 - Separate marketing site at intellifill.com (Astro)
 - Clean auth pages (no marketing content)
 - Consolidated navigation (6 items)
@@ -85,6 +86,18 @@ See [milestones/v1.2-ROADMAP.md](milestones/v1.2-ROADMAP.md) for full details.
 | 6. UX Cleanup         | v1.2      | 2/2            | Complete    | 2026-01-21 |
 | 7. Marketing Site     | v1.2      | 3/3            | Complete    | 2026-01-22 |
 | 8. Polish             | v1.2      | 3/3            | Complete    | 2026-01-25 |
+| 9. Extension Release  | v1.3      | 0/0            | Not planned | —          |
+
+### Phase 9: Extension Release
+
+**Goal:** Ship the IntelliFill browser extension to Chrome Web Store and Firefox Add-ons. Covers: store listing assets, compliance review, privacy policy, documentation, testing validation, backend API readiness for production extension traffic, and submission process.
+**Requirements**: TBD
+**Depends on:** Phase 8
+**Plans:** 0 plans
+
+Plans:
+
+- [ ] TBD (run /gsd-plan-phase 9 to break down)
 
 ---
 

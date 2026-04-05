@@ -25,6 +25,7 @@ Progress: █████████████████████ 30/30 
 - Phase 8: Polish (3/3 plans)
 
 **Delivered:**
+
 - Removed fake/broken UI elements
 - Consolidated navigation to 5-6 items
 - Separate marketing site at intellifill.com (Astro)
@@ -40,6 +41,7 @@ Progress: █████████████████████ 30/30 
 - Phase 5: Stripe Integration (4/4 plans)
 
 **Delivered:**
+
 - Stripe SDK v17 integration
 - PRO subscription checkout ($19/month)
 - Instant unlock on payment
@@ -54,6 +56,7 @@ Progress: █████████████████████ 30/30 
 - Phase 4: PRO Features (5/5 plans)
 
 **Delivered:**
+
 - 3-step wizard: Upload → See → Fill
 - Smart document detection with Gemini AI
 - Multi-person entity resolution
@@ -88,6 +91,7 @@ Progress: █████████████████████ 30/30 
 All decisions documented in PROJECT.md Key Decisions table (24 decisions total).
 
 **Phase 8 Decisions:**
+
 - Use localStorage for favorites (no backend endpoint needed for v1)
 - Remove preview modal in favor of direct navigation to fill-form
 - Summary row shows 3 key metrics: documents, processed today, success rate
@@ -97,6 +101,7 @@ All decisions documented in PROJECT.md Key Decisions table (24 decisions total).
 - Glow and shadow intensities reduced by ~50% across upload page
 
 **Phase 7 Decisions:**
+
 - Marketing content removed from auth pages, will be on dedicated marketing site
 - Auth pages use centered single-column layout pattern
 - Animated background boxes kept for subtle visual interest
@@ -105,6 +110,10 @@ All decisions documented in PROJECT.md Key Decisions table (24 decisions total).
 - Static output for CDN deployment
 - Two separate Vercel projects from same repo (marketing/ and quikadmin-web/)
 - Marketing at intellifill.com, app at app.intellifill.com
+
+### Roadmap Evolution
+
+- Phase 9 added: Extension Release — Ship browser extension to Chrome Web Store and Firefox Add-ons
 
 ### Deferred Issues
 
