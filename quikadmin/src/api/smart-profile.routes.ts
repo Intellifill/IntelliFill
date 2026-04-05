@@ -15,6 +15,9 @@ import { authenticateSupabase, AuthenticatedRequest } from '../middleware/supaba
 import { piiSafeLogger as logger } from '../utils/piiSafeLogger';
 import { validateFilePath } from '../utils/encryption';
 import { smartProfileBatchService } from '../services/batch/SmartProfileBatchService';
+import { ProfileService } from '../services/ProfileService';
+import { prisma } from '../utils/prisma';
+import { encryptJSON } from '../utils/encryption';
 
 // ============================================================================
 // Multer Configuration
@@ -172,11 +175,70 @@ async function extractBatchHandler(req: AuthenticatedRequest, res: Response, nex
     }
 
     const itemFiles = files.map((f) => ({ path: f.path, originalname: f.originalname }));
-    const response = await smartProfileBatchService.extractBatch(
-      itemFiles,
-      documentTypes,
-      req.user?.id
-    );
+    const userId = req.user?.id;
+    const response = await smartProfileBatchService.extractBatch(itemFiles, documentTypes, userId);
+
+    // Persist extracted data to Document records so ProfileService can aggregate them.
+    // Without this, Smart Profile uploads are frontend-only and invisible to the extension.
+    if (response.success && userId && Object.keys(response.profileData).length > 0) {
+      try {
+        // Create a Document record per uploaded file with the merged extracted data
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          const docType = documentTypes[i] || 'unknown';
+
+          // Build per-document extracted data from fieldSources
+          const perDocData: Record<string, string> = {};
+          for (const [fieldKey, source] of Object.entries(response.fieldSources)) {
+            if (source.documentId === file.originalname || files.length === 1) {
+              perDocData[fieldKey] = String(response.profileData[fieldKey] ?? '');
+            }
+          }
+          // If no fields matched this doc (multi-doc case), use all fields for single-doc uploads
+          // For single-doc uploads where no per-doc matching happened, use all profile data
+          const fallbackData: Record<string, string> = {};
+          if (Object.keys(perDocData).length === 0 && files.length === 1) {
+            for (const [k, v] of Object.entries(response.profileData)) {
+              fallbackData[k] = String(v ?? '');
+            }
+          }
+          const dataToSave = Object.keys(perDocData).length > 0 ? perDocData : fallbackData;
+          if (Object.keys(dataToSave).length === 0) continue;
+
+          await prisma.document.create({
+            data: {
+              userId,
+              fileName: file.originalname,
+              fileType: file.mimetype || 'application/octet-stream',
+              fileSize: file.size || 0,
+              storageUrl: `smart-profile://${file.originalname}`,
+              status: 'COMPLETED',
+              extractedData: encryptJSON(dataToSave),
+              confidence: 0.85,
+              processedAt: new Date(),
+              tags: ['smart-profile', docType],
+            },
+          });
+        }
+
+        // Trigger profile aggregation so the extension sees the new data
+        const profileService = new ProfileService();
+        const profile = await profileService.aggregateUserProfile(userId);
+        await profileService.saveProfile(userId, profile, {
+          ipAddress: req.ip || undefined,
+          userAgent: req.headers['user-agent'] || undefined,
+        });
+
+        logger.info('Smart Profile data persisted to documents and user profile', {
+          userId,
+          fieldsCount: Object.keys(response.profileData).length,
+          documentsCreated: files.length,
+        });
+      } catch (persistError) {
+        // Don't fail the response if persistence fails — user still gets their data
+        logger.error('Failed to persist Smart Profile data:', persistError);
+      }
+    }
 
     res.json(response);
   } catch (error) {
