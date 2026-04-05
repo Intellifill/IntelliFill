@@ -86,18 +86,18 @@ See [milestones/v1.2-ROADMAP.md](milestones/v1.2-ROADMAP.md) for full details.
 | 6. UX Cleanup         | v1.2      | 2/2            | Complete    | 2026-01-21 |
 | 7. Marketing Site     | v1.2      | 3/3            | Complete    | 2026-01-22 |
 | 8. Polish             | v1.2      | 3/3            | Complete    | 2026-01-25 |
-| 9. Extension Release  | v1.3      | 1/3            | In Progress |            |
+| 9. Extension Release  | v1.3      | 2/3            | In Progress |            |
 
 ### Phase 9: Extension Release
 
 **Goal:** Ship the IntelliFill browser extension to Chrome Web Store and Firefox Add-ons. Fix production build configuration (localhost to app.intellifill.com), add Firefox CORS support, update privacy policy with extension disclosures, create store listing assets, and submit to both stores.
 **Requirements**: EXT-01 through EXT-11
 **Depends on:** Phase 8
-**Plans:** 1/3 plans executed
+**Plans:** 2/3 plans executed
 
 Plans:
 
-- [ ] 09-01-PLAN.md — Production build config (localhost fix, env vars, Firefox CORS)
+- [x] 09-01-PLAN.md — Production build config (localhost fix, env vars, Firefox CORS)
 - [x] 09-02-PLAN.md — Privacy policy update and store listing assets
 - [ ] 09-03-PLAN.md — Screenshot guide, submission checklists, and deployment verification
 

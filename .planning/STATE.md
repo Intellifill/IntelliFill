@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 09-02-PLAN.md
-last_updated: '2026-04-05T11:20:13.552Z'
+stopped_at: Completed 09-extension-release 09-01-PLAN.md
+last_updated: '2026-04-05T11:24:08.947Z'
 last_activity: 2026-04-05 -- Phase 09 planning complete
 progress:
   total_phases: 1
   completed_phases: 0
   total_plans: 3
-  completed_plans: 1
-  percent: 33
+  completed_plans: 2
+  percent: 67
 ---
 
 # Project State
@@ -100,6 +100,7 @@ Progress: █████████████████████ 30/30 
 | 7-Marketing                    | 3/3   | ~26 min | ~9 min   |
 | 8-Polish                       | 3/3   | ~14 min | ~5 min   |
 | Phase 09-extension-release P02 | 8     | 2 tasks | 4 files  |
+| Phase 09-extension-release P01 | 6     | 3 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -130,6 +131,8 @@ All decisions documented in PROJECT.md Key Decisions table (24 decisions total).
 - [Phase 09-extension-release]: Privacy policy Section 6 covers all 4 D-08 disclosures verified against actual code constants
 - [Phase 09-extension-release]: Firefox store listing includes Reviewer Notes with WXT build instructions for AMO review process
 - [Phase 09-extension-release]: Permission justification data use table maps to Chrome Web Store Privacy tab checkboxes
+- [Phase 09-extension-release]: WXT_API_URL env var with production fallback enables env-driven API config across dev and prod builds
+- [Phase 09-extension-release]: moz-extension CORS regex strictly anchored with UUID format to prevent substring attacks
 
 ### Roadmap Evolution
 
@@ -149,8 +152,8 @@ None — v1.2 milestone complete. All 3 milestones shipped.
 
 ## Session Continuity
 
-Last session: 2026-04-05T11:20:13.549Z
-Stopped at: Completed 09-02-PLAN.md
+Last session: 2026-04-05T11:24:08.944Z
+Stopped at: Completed 09-extension-release 09-01-PLAN.md
 Resume file: None
 Next: Ready for v1.3 or new initiatives
 
