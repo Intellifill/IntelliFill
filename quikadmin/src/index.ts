@@ -185,6 +185,8 @@ async function initializeApp(): Promise<{ app: Application }> {
       /^http:\/\/localhost:\d{4,5}$/,
       // Chrome/Edge browser extensions (32-char lowercase alpha ID)
       /^chrome-extension:\/\/[a-z]{32}$/,
+      // Firefox browser extensions (UUID format)
+      /^moz-extension:\/\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
     ];
 
     // Validate origin with strict security
