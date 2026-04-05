@@ -7,6 +7,6 @@ export interface ExtensionSettings {
 
 export const DEFAULT_SETTINGS: ExtensionSettings = {
   enabled: true,
-  apiEndpoint: 'http://localhost:3002/api',
+  apiEndpoint: import.meta.env.WXT_API_URL ?? 'https://app.intellifill.com/api',
   cacheMinutes: 5,
 };
