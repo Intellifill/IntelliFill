@@ -76,28 +76,30 @@ See [milestones/v1.2-ROADMAP.md](milestones/v1.2-ROADMAP.md) for full details.
 
 **All milestones shipped.** Ready for v1.3 planning.
 
-| Phase                 | Milestone | Plans Complete | Status      | Completed  |
-| --------------------- | --------- | -------------- | ----------- | ---------- |
-| 1. Foundation         | v1.0      | 6/6            | Complete    | 2026-01-15 |
-| 2. Intelligence       | v1.0      | 4/4            | Complete    | 2026-01-15 |
-| 3. Polish             | v1.0      | 4/4            | Complete    | 2026-01-16 |
-| 4. PRO Features       | v1.0      | 5/5            | Complete    | 2026-01-16 |
-| 5. Stripe Integration | v1.1      | 4/4            | Complete    | 2026-01-20 |
-| 6. UX Cleanup         | v1.2      | 2/2            | Complete    | 2026-01-21 |
-| 7. Marketing Site     | v1.2      | 3/3            | Complete    | 2026-01-22 |
-| 8. Polish             | v1.2      | 3/3            | Complete    | 2026-01-25 |
-| 9. Extension Release  | v1.3      | 0/0            | Not planned | —          |
+| Phase                 | Milestone | Plans Complete | Status   | Completed  |
+| --------------------- | --------- | -------------- | -------- | ---------- |
+| 1. Foundation         | v1.0      | 6/6            | Complete | 2026-01-15 |
+| 2. Intelligence       | v1.0      | 4/4            | Complete | 2026-01-15 |
+| 3. Polish             | v1.0      | 4/4            | Complete | 2026-01-16 |
+| 4. PRO Features       | v1.0      | 5/5            | Complete | 2026-01-16 |
+| 5. Stripe Integration | v1.1      | 4/4            | Complete | 2026-01-20 |
+| 6. UX Cleanup         | v1.2      | 2/2            | Complete | 2026-01-21 |
+| 7. Marketing Site     | v1.2      | 3/3            | Complete | 2026-01-22 |
+| 8. Polish             | v1.2      | 3/3            | Complete | 2026-01-25 |
+| 9. Extension Release  | v1.3      | 0/3            | Planned  | —          |
 
 ### Phase 9: Extension Release
 
-**Goal:** Ship the IntelliFill browser extension to Chrome Web Store and Firefox Add-ons. Covers: store listing assets, compliance review, privacy policy, documentation, testing validation, backend API readiness for production extension traffic, and submission process.
-**Requirements**: TBD
+**Goal:** Ship the IntelliFill browser extension to Chrome Web Store and Firefox Add-ons. Fix production build configuration (localhost to app.intellifill.com), add Firefox CORS support, update privacy policy with extension disclosures, create store listing assets, and submit to both stores.
+**Requirements**: EXT-01 through EXT-11
 **Depends on:** Phase 8
-**Plans:** 0 plans
+**Plans:** 3 plans
 
 Plans:
 
-- [ ] TBD (run /gsd-plan-phase 9 to break down)
+- [ ] 09-01-PLAN.md — Production build config (localhost fix, env vars, Firefox CORS)
+- [ ] 09-02-PLAN.md — Privacy policy update and store listing assets
+- [ ] 09-03-PLAN.md — Screenshot guide, submission checklists, and deployment verification
 
 ---
 
