@@ -5,6 +5,15 @@ import { piiSafeLogger as logger } from '../utils/piiSafeLogger';
 import { prisma } from '../utils/prisma';
 
 /**
+ * Convert snake_case to camelCase for extension compatibility.
+ * Backend stores keys as snake_case (e.g. "first_name"),
+ * but the browser extension's field-matcher expects camelCase ("firstName").
+ */
+function snakeToCamel(key: string): string {
+  return key.replace(/_([a-z0-9])/g, (_, char) => char.toUpperCase());
+}
+
+/**
  * Extract audit context from Express request
  */
 function getAuditContext(req: Request): AuditContext {
@@ -62,7 +71,7 @@ export function createProfileRoutes(): Router {
         const responseData = {
           userId: profile.userId,
           fields: Object.values(profile.fields).map((field) => ({
-            key: field.key,
+            key: snakeToCamel(field.key),
             values: field.values,
             sourceCount: field.sources.length,
             confidence: Math.round(field.confidence * 100) / 100,
@@ -142,7 +151,7 @@ export function createProfileRoutes(): Router {
         const responseData = {
           userId: updatedProfile.userId,
           fields: Object.values(updatedProfile.fields).map((field) => ({
-            key: field.key,
+            key: snakeToCamel(field.key),
             values: field.values,
             sourceCount: field.sources.length,
             confidence: Math.round(field.confidence * 100) / 100,
@@ -191,7 +200,7 @@ export function createProfileRoutes(): Router {
         const responseData = {
           userId: profile.userId,
           fields: Object.values(profile.fields).map((field) => ({
-            key: field.key,
+            key: snakeToCamel(field.key),
             values: field.values,
             sourceCount: field.sources.length,
             confidence: Math.round(field.confidence * 100) / 100,
@@ -305,7 +314,7 @@ export function createProfileRoutes(): Router {
         res.json({
           success: true,
           field: {
-            key: field.key,
+            key: snakeToCamel(field.key),
             values: field.values,
             sourceCount: field.sources.length,
             confidence: Math.round(field.confidence * 100) / 100,
