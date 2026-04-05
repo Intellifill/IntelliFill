@@ -99,7 +99,7 @@ Plans:
 
 - [x] 09-01-PLAN.md — Production build config (localhost fix, env vars, Firefox CORS)
 - [x] 09-02-PLAN.md — Privacy policy update and store listing assets
-- [ ] 09-03-PLAN.md — Screenshot guide, submission checklists, and deployment verification
+- [x] 09-03-PLAN.md — Screenshot guide, submission checklists, and deployment verification
 
 ---
 
